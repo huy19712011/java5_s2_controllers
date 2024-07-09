@@ -3,15 +3,21 @@ package com.example.java5_s2_controllers.controllers;
 import com.example.java5_s2_controllers.entities.Student;
 import com.example.java5_s2_controllers.services.StudentService;
 import jakarta.annotation.Nullable;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.stereotype.Repository;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import jakarta.servlet.http.Cookie;
+
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Controller
 //@RequestMapping(path = "/basic") // 4. on class level
@@ -153,6 +159,47 @@ public class BasicController {
     @ResponseBody
     public String method6(){
         return "method6";
+    }
+
+
+    //7. @CookieValue: working with cookie
+
+    // 7a. reading cookie
+    @RequestMapping("/readCookie")
+    @ResponseBody
+    public String readCookieValue(@CookieValue(value = "username",
+            defaultValue = "defaultName") String username)
+    {
+        // Your logic here using the cookie value
+        return "Cookie Value: " + username;
+    }
+
+    // 7b. setting cookie
+    @GetMapping("/change-username")
+    @ResponseBody
+    public String setCookie(HttpServletResponse response) {
+        // create a cookie
+        Cookie cookie = new Cookie("username", "NewName");
+
+        //add cookie to response
+        response.addCookie(cookie);
+
+        return "Username is changed!";
+    }
+
+    //7c. reading all cookies
+    @GetMapping("/all-cookies")
+    @ResponseBody
+    public String readAllCookies(HttpServletRequest request) {
+
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            return Arrays.stream(cookies)
+                    .map(c -> c.getName() + " = " + c.getValue())
+                    .collect(Collectors.joining(", "));
+        }
+
+        return "No cookies";
     }
 
 
